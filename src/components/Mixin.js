@@ -1,20 +1,20 @@
 import Trackr from 'trackr';
 import EJSON from 'ejson';
 import Data from '../Data';
+import { InteractionManager } from 'react-native';
 
 export default {
   componentWillMount() {
-
-    Data.waitDdpReady(()=>{
-      if(this.getMeteorData) {
-        this.data = {};
-        this._meteorDataManager = new MeteorDataManager(this);
-        const newData = this._meteorDataManager.calculateData();
-        this._meteorDataManager.updateData(newData);
-      }
+    InteractionManager.runAfterInteractions(() => {
+      Data.waitDdpReady(()=>{
+        if(this.getMeteorData) {
+          this.data = {};
+          this._meteorDataManager = new MeteorDataManager(this);
+          const newData = this._meteorDataManager.calculateData();
+          this._meteorDataManager.updateData(newData);
+        }
+      });
     });
-
-
   },
   componentWillUpdate(nextProps, nextState) {
 
@@ -175,4 +175,3 @@ class MeteorDataManager {
     this.oldData = newData;
   }
 }
-
