@@ -25,7 +25,6 @@ module.exports = {
   logout(callback) {
     call("logout", err => {
       this.handleLogout();
-      this.connect();
 
       typeof callback == 'function' && callback(err);
     });
