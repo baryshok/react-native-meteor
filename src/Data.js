@@ -62,10 +62,10 @@ export default {
   off(eventName, cb) {
     this._cbs.splice(this._cbs.findIndex(_cb=>_cb.callback == cb && _cb.eventName == eventName), 1);
   },
-  notify(eventName) {
+  notify(eventName, ...args) {
     this._cbs.map(cb=>{
       if(cb.eventName == eventName && typeof cb.callback == 'function') {
-        cb.callback();
+        cb.callback(...args);
       }
     });
   }
