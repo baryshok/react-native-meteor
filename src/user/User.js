@@ -85,10 +85,12 @@ module.exports = {
   },
   _handleLoginCallback(err, result) {
     if(!err) {//save user id and token
-      AsyncStorage.setItem(TOKEN_KEY, result.token);
-      Data._tokenIdSaved = result.token;
-      this._userIdSaved = result.id;
-      Data.notify('onLogin');
+      if (result) {
+        AsyncStorage.setItem(TOKEN_KEY, result.token);
+        Data._tokenIdSaved = result.token;
+        this._userIdSaved = result.id;
+      }
+      Data.notify('onLogin', result);
     } else {
       Data.notify('onLoginFailure');
       this.handleLogout();
