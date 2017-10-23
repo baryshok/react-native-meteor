@@ -33,6 +33,7 @@ module.exports = {
     AsyncStorage.removeItem(TOKEN_KEY);
     Data._tokenIdSaved = null;
     this._userIdSaved = null;
+    Data.notify('onLogout');
   },
   loginWithPassword(selector, password, callback) {
     if (typeof selector === 'string') {
