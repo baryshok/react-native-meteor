@@ -9,11 +9,25 @@ db.debug = false;
 db.batchedUpdates = ReactNative.unstable_batchedUpdates;
 
 function runAfterOtherComputations(fn){
-  InteractionManager.runAfterInteractions(() => {
+  const interactionsTimeout = new Promise((resolve, reject) => {
+    InteractionManager.runAfterInteractions(resolve);
+  });
+
+  const maxTimeout = new Promise((resolve, reject) => {
+    this.sceneTransitionTimeout = setTimeout(resolve, 1000);
+  });
+
+  const onSuccess = () => {
     Trackr.afterFlush(() => {
       fn();
     });
-  });
+  };
+
+  const onFailure = (error) => {
+    console.log('[Error][RNMeteor][Data.runAfterOtherComputations]', error);
+  };
+
+  Promise.race([ interactionsTimeout, maxTimeout ]).then(onSuccess).catch(onFailure);
 }
 
 export default {
