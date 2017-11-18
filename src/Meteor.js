@@ -8,7 +8,7 @@ import DDP from '../lib/ddp.js';
 import Random from '../lib/Random';
 
 import Data from './Data';
-import collection from './Collection';
+import { Collection } from './Collection';
 import call from './Call';
 
 import Mixin from './components/Mixin';
@@ -37,8 +37,9 @@ module.exports = {
   MeteorListView,
   MeteorComplexListView,
   ReactiveDict,
+  Collection,
   FSCollectionImagesPreloader: Platform.OS == 'android' ? View : FSCollectionImagesPreloader,
-  collection,
+  collection(name, options) { return new Collection(name, options) },
   FSCollection,
   createContainer,
   getData() {
@@ -74,17 +75,7 @@ module.exports = {
     }
 
   },
-  waitDdpConnected(cb) {
-
-    if(Data.ddp && Data.ddp.status == 'connected') {
-      cb();
-    } else if(Data.ddp) {
-      Data.ddp.once('connected', cb);
-    } else {
-      setTimeout(()=>{ this.waitDdpConnected(cb) }, 10);
-    }
-
-  },
+  waitDdpConnected: Data.waitDdpConnected.bind(Data),
   reconnect() {
     Data.ddp && Data.ddp.connect();
   },
@@ -102,7 +93,7 @@ module.exports = {
       ...options
     });
 
-    NetInfo.isConnected.addEventListener('change', isConnected=>{
+    NetInfo.isConnected.addEventListener('connectionChange', isConnected=>{
       if(isConnected && Data.ddp.autoReconnect) {
         Data.ddp.connect();
       }
@@ -110,6 +101,13 @@ module.exports = {
 
 
     Data.ddp.on("connected", ()=>{
+
+      // Clear the collections of any stale data in case this is a reconnect
+      if (Data.db && Data.db.collections) {
+        for (var collection in Data.db.collections) {
+          Data.db[collection].remove({});
+        }
+      }
 
       Data.notify('change');
 

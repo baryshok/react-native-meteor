@@ -82,5 +82,14 @@ export default {
         cb.callback(...args);
       }
     });
+  },
+  waitDdpConnected(cb) {
+    if(this.ddp && this.ddp.status == 'connected') {
+      cb();
+    } else if(this.ddp) {
+      this.ddp.once('connected', cb);
+    } else {
+      setTimeout(()=>{ this.waitDdpConnected(cb) }, 10);
+    }
   }
 }
