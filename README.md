@@ -5,12 +5,16 @@
 
 Meteor-like methods for React Native.
 
+If you have questions, you can open a new issue in the repository or ask in the our Gitter chat:  
+https://gitter.im/react-native-meteor/Lobby
+
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [react-native-meteor](#react-native-meteor)
 	- [Compatibility notes](#compatibility-notes)
 	- [What is it for ?](#what-is-it-for-)
 	- [Install](#install)
+	- [Install from Git](#install-from-git)
 	- [Example usage](#example-usage)
 - [Connect your components](#connect-your-components)
 	- [createContainer](#createcontainer)
@@ -25,6 +29,9 @@ Meteor-like methods for React Native.
 	- [MeteorComplexListView Component](#meteorcomplexlistview-component)
 		- [Example usage](#example-usage)
 - [API](#api)
+	- [Meteor Collections](#meteor-collections)
+		- [Meteor.subscribe](#meteorsubscribe)
+		- [Meteor.collection(collectionName, options)](#meteorcollectioncollectionname-options)
 	- [Meteor DDP connection](#meteor-ddp-connection)
 		- [Meteor.connect(endpoint, options)](#meteorconnectendpoint-options)
 		- [Meteor.disconnect()](#meteordisconnect)
@@ -42,10 +49,14 @@ Meteor-like methods for React Native.
 
 <!-- /TOC -->
 
-
 ## Compatibility notes
 
 * Since RN 0.26.0 you have to use ws or wss protocol to connect to your meteor server. http is not working on Android.
+* It is recommended to always use the latest version of react-native-meteor compatible with your RN version.
+* For RN < 0.45, you can use version 1.0.3 in case or problems.
+* For RN 0.45, use version 1.0.6 of 'react-native-meteor'
+* For RN > 0.45, use 1.1.x
+* For RN > 0.49, use 1.2.x
 
 ## What is it for ?
 
@@ -58,9 +69,14 @@ The purpose of this library is :
 
 ## Install
 
-    npm i --save react-native-meteor@latest
+    npm i --save react-native-meteor
 
 [!! See detailed installation guide](https://github.com/inProgress-team/react-native-meteor/blob/master/docs/Install.md)
+
+## Install from Git
+Sometimes we do not have time to update the version of the NPM package. In this case, you can use the latest version from the repository.
+
+    npm i --save https://github.com/inProgress-team/react-native-meteor
 
 ## Example usage
 
@@ -81,18 +97,19 @@ class App extends Component {
   render() {
     const { settings, todosReady } = this.props;
 
-    <View>
-      <Text>{settings.title}</Text>
-        {!todosReady && <Text>Not ready</Text>}
+    return(
+      <View>
+        <Text>{settings.title}</Text>
+          {!todosReady && <Text>Not ready</Text>}
 
-        <MeteorListView
-          collection="todos"
-          selector={{done: true}}
-          options={{sort: {createdAt: -1}}}
-          renderRow={this.renderRow}
-        />
-    </View>
-
+          <MeteorListView
+            collection="todos"
+            selector={{done: true}}
+            options={{sort: {createdAt: -1}}}
+            renderRow={this.renderRow}
+          />
+      </View>
+    )
   }
 }
 
@@ -178,8 +195,8 @@ class Orders extends Component {
 
 These variables can be used inside getMeteorData or createContainer. They will be populated into your component if they change.
 
-* [Meteor.subscribe](http://docs.meteor.com/#/full/meteor_subscribe) : returns an handle. !! If the component which called subscribe is unmounted, the subscription is automatically canceled.
-* Meteor.collection(collectionName)
+* [Meteor.subscribe()](http://docs.meteor.com/#/full/meteor_subscribe)
+* Meteor.collection(collectionName, options)
   * [.find(selector, options)](http://docs.meteor.com/#/full/find)
   * [.findOne(selector, options)](http://docs.meteor.com/#/full/findone)
 * [Meteor.user()](http://docs.meteor.com/#/full/meteor_user)
@@ -192,7 +209,7 @@ These variables can be used inside getMeteorData or createContainer. They will b
 
 These methods (except update) work offline. That means that elements are correctly updated offline, and when you reconnect to ddp, Meteor calls are taken care of.
 
-* Meteor.collection(collectionName)
+* Meteor.collection(collectionName, options)
   * [.insert(doc, callback)](http://docs.meteor.com/#/full/insert)
   * [.update(id, modifier, [options], [callback])](http://docs.meteor.com/#/full/update)
   * [.remove(id, callback(err, countRemoved))](http://docs.meteor.com/#/full/remove)
@@ -238,6 +255,21 @@ Same as [ListView](https://facebook.github.io/react-native/docs/listview.html) C
 ```
 
 # API
+
+## Meteor Collections
+
+### Meteor.subscribe
+[Meteor.subscribe()](http://docs.meteor.com/#/full/meteor_subscribe) returns an handle. If the component which called subscribe is unmounted, the subscription is automatically canceled.
+
+### Meteor.collection(collectionName, options)
+You need pass the `cursoredFind` option when you get your collection if you want to use cursor-like method:
+
+```‍‍‍javascript
+Meteor.collection("collectionName", { cursoredFind: true })
+```
+
+Or you can simply use `find()` to get an array of documents. The option default to false for backward compatibility. Cursor methods are available to share code more easily between a react-native app and a standard Meteor app.
+
 
 ## Meteor DDP connection
 
@@ -361,4 +393,4 @@ Once connected to the ddp server, you can access every method available in [ddp.
 
 # Want to help ?
 
-Pull Requests and issues reported are welcome ! :)
+Pull Requests and issues reported are welcome! :)
